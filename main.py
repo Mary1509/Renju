@@ -118,14 +118,17 @@ else:
         result_file.close()
     
     elif sys.argv[1] == 'generate':
-        n = int(input('Enter number of tests to generate'))
-        result_file =  open('input.txt', 'w')
-        print(n, file=result_file)
-        while n > 0:
-            game = RenjuGame()
-            winner = game.play_random_game()
-            game.print_board(file=result_file)
-            n -= 1
-        result_file.close()
+        try:
+            n = int(input('Enter number of tests to generate: '))
+            result_file =  open('input.txt', 'w')
+            print(n, file=result_file)
+            while n > 0:
+                game = RenjuGame()
+                winner = game.play_random_game()
+                game.print_board(file=result_file)
+                n -= 1
+            result_file.close()
+        except ValueError as e:
+            print(e, file=sys.stderr)
     else:
         raise ValueError("Illegal argument")
