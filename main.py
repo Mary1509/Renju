@@ -3,11 +3,15 @@ import random
 from itertools import islice
 import sys 
 
+BLACK = '1'
+WHITE = '2'
+EMPTY = '0'
+
 class RenjuGame:
     def __init__(self, size=19):
         self.size = size
         self.board = [['0' for _ in range(size)] for _ in range(size)]
-        self.current_player = '1'
+        self.current_player = BLACK
         self.winner = None
         self.leftmost = ()
 
@@ -17,13 +21,13 @@ class RenjuGame:
         print('\n', file=file)
 
     def make_move(self, row, col):
-        if self.board[row][col] == '0':
+        if self.board[row][col] == EMPTY:
             self.board[row][col] = self.current_player
             win = self.check_win(row, col)
             if win:
                 self.winner = self.current_player
                 return win
-            self.current_player = '1' if self.current_player == '2' else '2'
+            self.current_player = BLACK if self.current_player == WHITE else WHITE
             return False
         else:
             return False
@@ -34,7 +38,7 @@ class RenjuGame:
             count = 1  
             count += self.count_in_direction(row, col, dr, dc)
             count += self.count_in_direction(row, col, -dr, -dc)
-            if count >= 5:
+            if count == 5:
                 if dr == 1 and dc == -1:
                     self.find_leftmost(row, col, dr, dc)
                 else:
@@ -61,7 +65,7 @@ class RenjuGame:
     def is_full(self):
         for row in self.board:
             for cell in row:
-                if cell == '0':
+                if cell == EMPTY:
                     return False
         return True
 
@@ -83,7 +87,7 @@ class RenjuGame:
                     if win:
                         self.winner = self.board[row][col]
                         return self.winner
-                    self.current_player = '1' if self.current_player == '2' else '2'
+                    self.current_player = BLACK if self.current_player == WHITE else WHITE
                     
         return self.winner
 
@@ -94,7 +98,6 @@ if n_args > 2:
 else:
     if sys.argv[1] == 'test':
         result_file = open('output.txt', 'w')
-        game = RenjuGame()
 
         n = 0
         with open('input.txt', 'r') as fin:
@@ -107,7 +110,7 @@ else:
                     for row in islice(fin, 18):
                         row = row.replace('\n', '').split(' ')
                         board.append(row)
-
+                    game = RenjuGame()
                     winner = game.scan_from_test(board)
                     if winner:
                         print(f"{winner}", file=result_file)
