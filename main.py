@@ -6,6 +6,7 @@ import sys
 BLACK = '1'
 WHITE = '2'
 EMPTY = '0'
+WIN_CONDITION = 5
 
 class RenjuGame:
     def __init__(self, size=19):
@@ -28,38 +29,38 @@ class RenjuGame:
                 self.winner = self.current_player
                 return win
             self.current_player = BLACK if self.current_player == WHITE else WHITE
-            return False
-        else:
-            return False
+        
+        return False
 
     def check_win(self, row, col):
         directions = [(1, 0), (0, 1), (1, 1), (1, -1)]
-        for dr, dc in directions:
+        for direction_row, direction_col in directions:
             count = 1  
-            count += self.count_in_direction(row, col, dr, dc)
-            count += self.count_in_direction(row, col, -dr, -dc)
-            if count == 5:
-                if dr == 1 and dc == -1:
-                    self.find_leftmost(row, col, dr, dc)
+            count += self.count_in_direction(row, col, direction_row, direction_col)
+            count += self.count_in_direction(row, col, -direction_row, -direction_col)
+            if count == WIN_CONDITION:
+                if direction_row == 1 and direction_col == -1:
+                    self.find_leftmost(row, col, direction_row, direction_col)
                 else:
-                    self.find_leftmost(row, col, -dr, -dc)
+                    self.find_leftmost(row, col, -direction_row, -direction_col)
                 return True
+        
         return False
 
-    def find_leftmost(self, row, col, dr, dc):
-        r, c = row + dr, col + dc
-        while 0 <= r < self.size and 0 <= c < self.size and self.board[r][c] == self.current_player:
-            r += dr
-            c += dc
-        self.leftmost = (r-dr+1,c-dc+1)
+    def find_leftmost(self, row, col, direction_row, direction_col):
+        row_move, col_move = row + direction_row, col + direction_col
+        while 0 <= row_move < self.size and 0 <= col_move < self.size and self.board[row_move][col_move] == self.current_player:
+            row_move += direction_row
+            col_move += direction_col
+        self.leftmost = (row_move-direction_row+1,col_move-direction_col+1)
 
-    def count_in_direction(self, row, col, dr, dc):
-        r, c = row + dr, col + dc
+    def count_in_direction(self, row, col, direction_row, direction_col):
+        row_move, col_move = row + direction_row, col + direction_col
         count = 0
-        while 0 <= r < self.size and 0 <= c < self.size and self.board[r][c] == self.current_player:
+        while 0 <= row_move < self.size and 0 <= col_move < self.size and self.board[row_move][col_move] == self.current_player:
             count += 1
-            r += dr
-            c += dc
+            row_move += direction_row
+            col_move += direction_col
         return count
 
     def is_full(self):
@@ -94,7 +95,7 @@ class RenjuGame:
 
 n_args = len(sys.argv)
 if n_args > 2:
-    raise ValueError("Too much arguments")
+    raise ValueError("Too many arguments")
 else:
     if sys.argv[1] == 'test':
         result_file = open('output.txt', 'w')
